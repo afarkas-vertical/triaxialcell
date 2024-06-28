@@ -1,50 +1,101 @@
-import pyvisa as visa
 from tkinter import *
-from tkinter import ttk
+import tkinter as tk
+from tkinter.filedialog import askdirectory
+import numpy as np
+import pyvisa as visa
+import matplotlib.pyplot as plt
+import datetime as dt
 
-class DataViewer:
+master = tk.Tk()
+master.title("Data from VNA")
+defaultName = None
+saveLocation = None
 
-    def __init__(self, root):
-
-        root.title("Triaxial Cell Data Viewer")
-
-        mainframe = ttk.Frame(root, padding="3 3 12 12")
-        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-        root.columnconfigure(0, weight=1)
-        root.rowconfigure(0, weight=1)
+def saveButton():
+    if e1.index("end") == 0:
+            print("Please choose a save directory")
+    elif e2.index("end") == 0:
+        print("Please add file name!")
+    else:
+        frmt = str(fileFormat[picFormat.get()])       
+        fullname = (e1.get()+"/"+ e2.get()+"."+frmt)
+        saveFile(fullname, frmt)
        
-        #self.feet = StringVar()
-        #feet_entry = ttk.Entry(mainframe, width=7, textvariable=self.feet)
-        #feet_entry.grid(column=2, row=1, sticky=(W, E))
-        #self.meters = StringVar()
+def openDialog():
+    defaultName= askdirectory()
+    e1.delete(0, END)
+    e1.insert(0, defaultName)
+    print(defaultName)
+    return
 
-        self.connected = BooleanVar()
+def pullData():
+    # connects to the instrument and does some error checking
+    rm = visa.ResourceManager()
+    
+    # simple error catching in case the resource is not available
+    try:
+        vna = rm.open_resource('TCPIP0::169.254.0.28::INSTR')
+    except:
+        print('resource does not exist')
 
-        ttk.Label(mainframe, textvariable=self.connected).grid(column=2, row=2, sticky=(W, E))
-        ttk.Button(mainframe, text="Pull Data", command=self.pullData).grid(column=3, row=3, sticky=W)
+    # if you feel like error checking
+    res = vna.query('*IDN?')
+    # pulls the trace data directly from active trace
+    data_raw = vna.query('CALC:DATA? FDAT')
+    data = np.array([float(i) for i in data_raw.split(',')])
+    freq_raw = vna.query('CALC:DATA:STIM?')
+    freq = np.array([float(i) for i in freq_raw.split(',')])/1E6
 
-        #ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
-        #ttk.Label(mainframe, text="is equivalent to").grid(column=1, row=2, sticky=E)
-        #ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
+    # now plot data in a new window
+    plt.plot(freq,data)
+    plt.ylim([-140,0])
+    plt.semilogx()
+    plt.xlabel('Frequency (MHz)')
+    plt.ylabel('Magnitude (dB)')
+    plt.title('Data from vna at ' + dt.datetime.now().strftime('%H:%M:%S'))
+    plt.show()
 
-        for child in mainframe.winfo_children(): 
-            child.grid_configure(padx=5, pady=5)
 
-        #feet_entry.focus()
-        #root.bind("<Return>", self.exit())
-        
-    def pullData(self, *args):
-        
-        rm = visa.ResourceManager()
-        
-        try:
-            vna = rm.open_resource('blah::blah::blah::blah')
-            
-        except:
-            print('resource does not exist')
 
-        return True
+    return
 
-root = Tk()
-DataViewer(root)
-root.mainloop()
+#Setup Frames
+f1 = tk.Frame(master, width=400, height=180)
+f2 = tk.Frame(f1, width=300, height=250)
+f3 = tk.Frame(f1, width=200, height=50)
+f4 = tk.Frame(f3, width=300, height=100)
+f5 = tk.Frame(f1, width=200, height=10)
+separator1 = Frame(f1, height=2, bd=1, relief=SUNKEN)
+separator2 = Frame(f1, height=2, bd=1, relief=SUNKEN)
+
+#pack the frames
+f1.pack(expand=1)
+f1.pack_propagate(0) #fix size
+f2.pack()
+separator1.pack(fill=X, padx=5, pady=5)
+f3.pack(fill=X)
+f4.pack(side=TOP, expand=FALSE)
+separator2.pack(fill=X, padx=5, pady=5)
+f5.pack(side=TOP, fill=X)
+
+#Text entry
+e1 = Entry(f2, width = 50)
+e2 = Entry(f2, width = 50)
+e2.focus_set() #put cursor in first box
+e1.grid(row=2, column=1, padx=5, pady=3,)
+e2.grid(row=4, column=1, padx=5, pady=3)
+
+#Labels
+label1 = Label(f2,text="Select Save Location..")
+label1.grid(row=1,column=1, sticky = W)
+label2 = Label(f2,text="Enter File Name..")
+label2.grid(row=3,column=1, sticky = W)
+
+#Buttons
+button1 = Button(f2, text = "Open Folder", padx=5, pady=1, width=9, command=openDialog).grid(row=2, column = 2)
+button2 = Button(f2, text = "Save File", padx=5, pady=1, width=9, command=saveButton).grid(row=4, column = 2)
+button3 = Button(f5, text = "Quit", padx=5, pady=1, width=9, command=quit).pack(side=TOP)
+button4 = tk.Button(f4,text="Pull", padx=10, pady=1, command=pullData).grid(row=1, column=2)
+
+#Main
+mainloop()
