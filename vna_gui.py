@@ -43,6 +43,7 @@ def pullData():
     # pulls the trace data directly from active trace
     data_raw = vna.query('CALC:DATA? FDAT')
     data = np.array([float(i) for i in data_raw.split(',')])
+    # pulls the frequency data and converts to MHz
     freq_raw = vna.query('CALC:DATA:STIM?')
     freq = np.array([float(i) for i in freq_raw.split(',')])/1E6
 
@@ -55,7 +56,7 @@ def pullData():
     plt.title('Data from vna at ' + dt.datetime.now().strftime('%H:%M:%S'))
     plt.show()
 
-
+    #TODO: May have to save from here if can't get a handle to the plot via stupid window bs 
 
     return
 
