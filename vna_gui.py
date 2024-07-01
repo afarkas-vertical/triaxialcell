@@ -5,9 +5,10 @@ import numpy as np
 import pyvisa as visa
 import matplotlib.pyplot as plt
 import datetime as dt
+import pandas as pd
 
 master = tk.Tk()
-master.title("Data from VNA")
+master.title("Data pull from VNA")
 defaultName = None
 saveLocation = None
 
@@ -17,11 +18,10 @@ def saveButton():
     elif e2.index("end") == 0:
         print("Please add file name!")
     else:
-        frmt = str(fileFormat[picFormat.get()])       
-        fullname = (e1.get()+"/"+ e2.get()+"."+frmt)
-        saveFile(fullname, frmt)
+        df.to_csv(defaultName + '/' + e2.get() + '.csv')
        
 def openDialog():
+    global defaultName
     defaultName= askdirectory()
     e1.delete(0, END)
     e1.insert(0, defaultName)
@@ -38,15 +38,17 @@ def pullData():
     except:
         print('resource does not exist')
 
+    global df
+
     # if you feel like error checking
     res = vna.query('*IDN?')
     # pulls the trace data directly from active trace
     data_raw = vna.query('CALC:DATA? FDAT')
-    data = np.array([float(i) for i in data_raw.split(',')])
+    data = np.round(np.array([float(i) for i in data_raw.split(',')]), 2)
     # pulls the frequency data and converts to MHz
     freq_raw = vna.query('CALC:DATA:STIM?')
-    freq = np.array([float(i) for i in freq_raw.split(',')])/1E6
-
+    freq = np.round(np.array([float(i) for i in freq_raw.split(',')])/1E6, 3)
+    
     # now plot data in a new window
     plt.plot(freq,data)
     plt.ylim([-140,0])
@@ -56,9 +58,10 @@ def pullData():
     plt.title('Data from vna at ' + dt.datetime.now().strftime('%H:%M:%S'))
     plt.show()
 
-    #TODO: May have to save from here if can't get a handle to the plot via stupid window bs 
+    # create a dataframe so we can easily save it later and transfer it between functions
+    df = pd.DataFrame(np.transpose(data), index=np.transpose(freq), columns=['Data'])
 
-    return
+    return df
 
 #Setup Frames
 f1 = tk.Frame(master, width=400, height=180)
