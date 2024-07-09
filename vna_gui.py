@@ -34,12 +34,11 @@ def pullData():
     
     # simple error catching in case the resource is not available
     try:
-        vna = rm.open_resource('TCPIP0::169.254.0.28::INSTR')
+        vna = rm.open_resource('TCPIP0::172.22.1.159::INSTR')
     except:
         print('resource does not exist')
 
     global df
-
     # if you feel like error checking
     res = vna.query('*IDN?')
     # pulls the trace data directly from active trace
