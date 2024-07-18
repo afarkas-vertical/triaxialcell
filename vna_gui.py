@@ -63,7 +63,8 @@ def pullData():
     plt.show()
 
     # create a dataframe so we can easily save it later and transfer it between functions
-    df = pd.DataFrame(np.transpose(data), index=np.transpose(freq), columns=['Data'])
+    df = pd.DataFrame(np.transpose(data), index=np.transpose(freq), columns=['Magnitude (dB)'])
+    df.index.name = 'Frequency (MHz)'
     # TODO: df['Uncal'] = np.transpose(data_u)
 
     return df
