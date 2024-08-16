@@ -32,7 +32,7 @@ def get_Files():
 def converter(files):
 	for f in files:
 		with open(f, newline='') as csvfile:
-			wb = csv.reader(csvfile.readlines()[2:])
+			wb = csv.reader(csvfile.readlines()[1:])
 			new_csv_file = open(f[:-4] + str('_conv.csv'), 'w', newline='')
 			wr = csv.writer(new_csv_file, quoting=csv.QUOTE_ALL)
 			# write the header row
@@ -49,7 +49,7 @@ def converter(files):
 				# initialize
 				newrow = [0,0,0,0]
 				# populate
-				newrow[0] = map(float, row[0])
+				newrow[0] = row[0]
 				newrow[1] = row[1]
 				newrow[2] = 10**(float(row[1])/20)
 				newrow[3] = (50*1e3)/(0.3)*10**(float(row[1])/20)	# should this be div 20? or div 10?
