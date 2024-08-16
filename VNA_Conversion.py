@@ -5,18 +5,9 @@ from tkinter import *
 import numpy as np
 import csv
 
-
-########################################################################################
-# Program Name:  VNAcsv_to_standard_csvMHz.py
-# Author: Stephen Board
-# Purpose: convert user-selected .csv files from format from VNA to typical format
-# Notes: you must select a .csv file
-########################################################################################
-
-
 ########################################################################################
 # Function:  get_File
-# Purpose: when called, the function opens a dialog box for the user to select a file
+# Purpose: when called, the function opens a dialog box for the user to select files
 # Returns: file name and extention chosen by user
 ########################################################################################
 
@@ -26,7 +17,7 @@ def get_Files():
 
 ########################################################################################b 	
 # Function:  converter 
-# Purpose: converts output VNA data to more easily parsable data
+# Purpose: converts output VNA data to Transfer Impedance calculated format
 # Returns: nothing
 ########################################################################################
 def converter(files):
