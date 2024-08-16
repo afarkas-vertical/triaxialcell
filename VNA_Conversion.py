@@ -33,25 +33,28 @@ def converter(files):
 	for f in files:
 		with open(f, newline='') as csvfile:
 			wb = csv.reader(csvfile.readlines()[2:])
-			your_csv_file = open(f[:-4]+'.csv', 'w', newline='') 
-			wr = csv.writer(your_csv_file, quoting=csv.QUOTE_ALL)
+			new_csv_file = open(f[:-4] + str('_conv.csv'), 'w', newline='')
+			wr = csv.writer(new_csv_file, quoting=csv.QUOTE_ALL)
+			# write the header row
+			newrow = [0,0,0,0]
+			newrow[0] = 'Frequency (MHz)'
+			newrow[1] = 'S21 (dB)'
+			newrow[2] = 'S21 (W)'
+			newrow[3] = 'ZT (mOhm/m)'
+			wr.writerow(newrow)
+			# now go through each row
 			for row in wb:
-				newrow = row[0].split(';')
-				newnewrow = [0,0,0,0,0]
-				try: 
-					newnewrow[0] = float(newrow[0])*1e-6
-					newnewrow[1] = float(newrow[1])
-					newnewrow[2] = 10**(float(newrow[1])/20)
-					newnewrow[3] = (50*1e3)/(0.3)*10**(float(newrow[1])/20)
-					newnewrow[4] = float(newrow[2])
-				except:
-					newnewrow[0] = 'freq[MHz]'
-					newnewrow[1] = 'dB Mag'
-					newnewrow[2] = 'S21'
-					newnewrow[3] = 'ZT(mOhm/m)'
-					newnewrow[4] = 'db Phase'
-				wr.writerow(newnewrow)
-			your_csv_file.close()
+				# remap to float for precision access
+				#row = map(np.float32, row)   
+				# initialize
+				newrow = [0,0,0,0]
+				# populate
+				newrow[0] = map(float, row[0])
+				newrow[1] = row[1]
+				newrow[2] = 10**(float(row[1])/20)
+				newrow[3] = (50*1e3)/(0.3)*10**(float(row[1])/20)	# should this be div 20? or div 10?
+				wr.writerow(newrow)
+			new_csv_file.close()
 
 if __name__ == "__main__":
 	root = Tk()

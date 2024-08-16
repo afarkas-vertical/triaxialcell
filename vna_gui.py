@@ -51,7 +51,7 @@ def pullData():
     
     # pulls the frequency data and converts to MHz
     freq_raw = vna.query('CALC:DATA:STIM?')
-    freq = np.round(np.array([float(i) for i in freq_raw.split(',')])/1E6, 3)
+    freq = np.round(np.array([float(i) for i in freq_raw.split(',')])/1E6, 6)
     
     # now plot data in a new window
     plt.plot(freq,data)
