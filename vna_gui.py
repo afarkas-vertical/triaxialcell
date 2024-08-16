@@ -34,7 +34,7 @@ def pullData():
     
     # simple error catching in case the resource is not available
     try:
-        vna = rm.open_resource('TCPIP0::172.22.1.159::INSTR')
+        vna = rm.open_resource('TCPIP0::10.1.2.82::INSTR')
     except:
         print('resource does not exist')
 
