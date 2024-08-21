@@ -12,7 +12,7 @@ import csv
 ########################################################################################
 
 def get_Files():
-	files = filedialog.askopenfilenames(parent=root,title='Choose raw TI .csv file')
+	files = filedialog.askopenfilenames(parent=root,title='Choose raw SE .csv file')
 	return files
 
 ########################################################################################b 	
@@ -33,6 +33,16 @@ def converter(files):
 			newrow[2] = 'S21 (W)'
 			newrow[3] = 'ZT (mOhm/m)'
 			wr.writerow(newrow)
+			
+            # some constants that need defining
+			er1=1.36
+			er2=1.1
+			Zo=50
+			Zs=150
+			er2t = er2
+        	er2n = er1/1.21 # this is an assumed 10% velocity difference for as150
+            offset150 = 10*np.log10((2*Zs)/Zo)
+            normOffset = 20*np.log10(np.sqrt(2)*((np.abs(1-np.sqrt(er2n/er1)))/(np.abs(1-(er2t/er1)))))
 			# now go through each row
 			for row in wb:
 				# remap to float for precision access
