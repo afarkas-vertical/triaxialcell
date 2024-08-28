@@ -27,11 +27,13 @@ def converter(files):
 			new_csv_file = open(f[:-4] + str('_conv.csv'), 'w', newline='')
 			wr = csv.writer(new_csv_file, quoting=csv.QUOTE_ALL)
 			# write the header row
-			newrow = [0,0,0,0]
+			newrow = [0,0,0,0,0,0]
 			newrow[0] = 'Frequency (MHz)'
 			newrow[1] = 'S21 (dB)'
 			newrow[2] = 'S21 (W)'
-			newrow[3] = 'ZT (mOhm/m)'
+			newrow[3] = 'SE (dB)'
+			newrow[4] = 'S150 (dB)'
+			newrow[5] = 'Snorm (dB)'
 			wr.writerow(newrow)
 			
             # some constants that need defining
@@ -40,20 +42,22 @@ def converter(files):
 			Zo=50
 			Zs=150
 			er2t = er2
-        	er2n = er1/1.21 # this is an assumed 10% velocity difference for as150
-            offset150 = 10*np.log10((2*Zs)/Zo)
-            normOffset = 20*np.log10(np.sqrt(2)*((np.abs(1-np.sqrt(er2n/er1)))/(np.abs(1-(er2t/er1)))))
-			# now go through each row
+			er2n = er1/1.21
+			offset150 = 10*np.log10((2*Zs)/Zo)
+			normOffset = 20*np.log10(np.sqrt(2)*((np.abs(1-np.sqrt(er2n/er1)))/(np.abs(1-(er2t/er1)))))
+
 			for row in wb:
 				# remap to float for precision access
 				#row = map(np.float32, row)   
 				# initialize
-				newrow = [0,0,0,0]
+				newrow = [0,0,0,0,0,0]
 				# populate
 				newrow[0] = row[0]
 				newrow[1] = row[1]
 				newrow[2] = 10**(float(row[1])/20)
-				newrow[3] = (50*1e3)/(0.3)*10**(float(row[1])/20)	# should this be div 20? or div 10?
+				newrow[3] = (50*1e3)/(0.3)*10**(float(row[1])/20)
+				newrow[4] = newrow[3] - offset150
+				newrow[5] = newrow[3] - offset150 - normOffset
 				wr.writerow(newrow)
 			new_csv_file.close()
 
