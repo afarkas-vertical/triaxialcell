@@ -193,8 +193,8 @@ def main():
 
 	for i in range(len(TI_filenames)):
 		SA_Plot.plot(SA_Datum_Array[i][0],(SA_Datum_Array[i][1]),color=c[i],linewidth=5,linestyle=ls[i%len(ls)])
-		SA_Plot.plot([100,EnvelopesArray[i][0][0]],[EnvelopesArray[i][1][0],EnvelopesArray[i][1][0]],color=c[i+5],linewidth=2,linestyle=ls[i%len(ls)])
-		SA_Plot.plot(EnvelopesArray[i][0],(EnvelopesArray[i][1]),color=c[i+5],linewidth=5,linestyle=ls[i%len(ls)])
+		SA_Plot.plot([100,EnvelopesArray[i][0][0]],[EnvelopesArray[i][1][0],EnvelopesArray[i][1][0]],color='black',linewidth=2,linestyle=ls[i%len(ls)])
+		SA_Plot.plot(EnvelopesArray[i][0],(EnvelopesArray[i][1]),color='black',linewidth=5,linestyle=ls[i%len(ls)])
 
 	TI_Plot.set_xlim([TI_Datum_Array[0][0][0],100])
 	TI_Plot.set_xscale('log')

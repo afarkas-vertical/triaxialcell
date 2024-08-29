@@ -38,7 +38,6 @@ def pullData():
     except:
         print('resource does not exist')
 
-    global df
     # if you feel like error checking
     res = vna.query('*IDN?')
     # pulls the trace data directly from active trace
@@ -62,6 +61,7 @@ def pullData():
     plt.title('Data from vna at ' + dt.datetime.now().strftime('%H:%M:%S'))
     plt.show()
 
+    global df
     # create a dataframe so we can easily save it later and transfer it between functions
     df = pd.DataFrame(np.transpose(data), index=np.transpose(freq), columns=['Magnitude (dB)'])
     df.index.name = 'Frequency (MHz)'
