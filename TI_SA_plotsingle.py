@@ -28,12 +28,13 @@ ls = ['-','--',':']
 cs=[['olivedrab','dashed'],['m','dotted'],['sienna','solid'],['gold','dashed'],['k','dotted'],['green','solid']]
 
 def get_File():
+	global TF_name
 	TF_file = filedialog.askopenfiles(parent=root,mode='rb',title='Choose a Transfer Impedance file')
 	for f in TF_file:
 		TF_name = f.name.split("/")
 		if TF_name[len(TF_name)-1][-4:] == ".csv":
 			error_clear = 1
-		Legend.append((TF_name[len(TF_name)-1][:-4]))#+'\n'+(SA_name[len(SA_name)-1][:-4]))
+		Legend.append((TF_name[len(TF_name)-1][:-14]))#+'\n'+(SA_name[len(SA_name)-1][:-4]))
 			# TIlegend.append(TF_name[len(TF_name)-1][:-4])
 	SA_file = filedialog.askopenfiles(parent=root,mode='rb',title='Choose a Screening Attenuation file')
 	for f in SA_file:
@@ -47,9 +48,9 @@ def get_File():
 
 
 def draw_UI():
-	S1 = Button(root, text="Add Trace", command=main)
+	S1 = Button(root, text="Add Trace", command=main, width=20, height=5)
 	S1.pack()
-	S2 = Button(root, text="save", command = save)
+	S2 = Button(root, text="save", command = save, width=18, height=5)
 	S2.pack()
 
 def get_TI_Data(file):
@@ -144,9 +145,16 @@ def getEnvelope(xarr,yarr,flong):
 	return(xenv,yenv)
 
 def save():
-
-	pt.savefig('filename.png', dpi=300)
-	print('here')
+	# have user choose save directory
+	save_dir = filedialog.askdirectory(title='Choose directory to save figure to:')
+	# name of file is inherited from global TF_file name
+	# save the file
+	try:
+		pt.savefig(save_dir + '/' + TF_name[len(TF_name)-1][:-14] + '_Plot.png', dpi=300)	
+		print(TF_name[len(TF_name)-1][:-14] + ' saved to: ' + save_dir)
+	except:
+		print('file saving had a problem!')
+	return
 
 def main():
 
@@ -174,7 +182,6 @@ def main():
 	SA_Datum_Array = (SA_Datum)
 	EnvelopesArray = np.array(envelopes)
 
-
 	TC_Plot_Fig = pt.figure(1,figsize=(17,10))
 	TI_Plot = pt.axes()
 
@@ -185,9 +192,9 @@ def main():
 	SA_Plot = divider.append_axes("right", size=7, pad=0)
 
 	for i in range(len(TI_filenames)):
-		SA_Plot.plot([100,EnvelopesArray[i][0][0]],[EnvelopesArray[i][1][0],EnvelopesArray[i][1][0]],color=c[i],linewidth=2,linestyle=ls[i%len(ls)])
-		SA_Plot.plot(EnvelopesArray[i][0],(EnvelopesArray[i][1]),color=c[i],linewidth=5,linestyle=ls[i%len(ls)])
-		SA_Plot.plot(SA_Datum_Array[i][0],(SA_Datum_Array[i][1]),color=c[i+1],linewidth=5,linestyle=ls[i%len(ls)])
+		SA_Plot.plot(SA_Datum_Array[i][0],(SA_Datum_Array[i][1]),color=c[i],linewidth=5,linestyle=ls[i%len(ls)])
+		SA_Plot.plot([100,EnvelopesArray[i][0][0]],[EnvelopesArray[i][1][0],EnvelopesArray[i][1][0]],color=c[i+5],linewidth=2,linestyle=ls[i%len(ls)])
+		SA_Plot.plot(EnvelopesArray[i][0],(EnvelopesArray[i][1]),color=c[i+5],linewidth=5,linestyle=ls[i%len(ls)])
 
 	TI_Plot.set_xlim([TI_Datum_Array[0][0][0],100])
 	TI_Plot.set_xscale('log')
