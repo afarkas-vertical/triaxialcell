@@ -115,45 +115,8 @@ def get_SA_Data(file,er1=1.36,er2=1.1,Zo=50,Zs=150,as150=True,norm=True):
 		sNorm.append(s_measured-offset150-normOffset)
 		freq.append(float(d[0]))
 
-	# CorrectionArray = np.array(getC_Data('C:/Pybin/reference/Calibration.csv'))
-	# for j in range(len(sNorm)):
-
-	# 	sNorm[j] -= CorrectionArray[1][j]
-
-
 	# return the data
 	return(freq,smeas,s150,sNorm,offset150)
-
-def getC_Data(file):
-	# we will fill these and then return them later
-	xarr = []
-	yarr = []
-	i = 0 # this is an iterator so we can skip the unncessary header lines
-	found = 0 # boolean to signal whether we ahve started finding data
-	while not found: # we iterate through each line in the csv until we start finding numbers
-		first = list(reader(open(file)))[i][0]
-		try:
-			float(first) # this is called a float-cast. if it works, we're good
-			found = 1
-		except:  # if it breaks, we need to go to the next line and try again
-			i += 1
-
-	# now we know where the data begins so we should grab everything else
-	data = list(reader(open(file)))[i:]
-
-	# now we go through the rows and we know the first row (0) is the frequency, and based on experience
-	# and checking the files (THIS CAN BE A MISTAKE WHICH MUST BE CHANGED SOMETIMES), the 6th column (5)
-	# holds the 'normalized' as(150) Screening attentuation data
-	i = 0
-	for d in data:
-		i += 1
-
-		yarr.append(20*np.log10(float(d[1])))
-
-		xarr.append(float(d[0]))
-
-	return(xarr,yarr)
-
 
 def getEnvelope(xarr,yarr,flong):
 	xenv,yenv = [],[]
@@ -197,7 +160,7 @@ def main():
 	TI_Datum = []
 	SA_Datum = []
 	envelopes = []
-	print("error_clear")
+
 	for f in TI_filenames:
 		TI_Datum.append(get_TI_Data(f))
 	for f in SA_filenames:
