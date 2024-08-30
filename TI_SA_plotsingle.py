@@ -35,13 +35,11 @@ def get_File():
 		if TF_name[len(TF_name)-1][-4:] == ".csv":
 			error_clear = 1
 		Legend.append((TF_name[len(TF_name)-1][:-14]))#+'\n'+(SA_name[len(SA_name)-1][:-4]))
-			# TIlegend.append(TF_name[len(TF_name)-1][:-4])
 	SA_file = filedialog.askopenfiles(parent=root,mode='rb',title='Choose a Screening Attenuation file')
 	for f in SA_file:
 		SA_name = f.name.split("/")
 		if SA_name[len(SA_name)-1][-4:] == ".csv":
 			error_clear = 1
-			# SAlegend.append(SA_name2[len(SA_name)-1][:-4])
 		else: error_clear = 0
 		
 	return TF_file,SA_file,error_clear
@@ -96,24 +94,14 @@ def get_SA_Data(file,er1=1.36,er2=1.1,Zo=50,Zs=150,as150=True,norm=True):
 
 	# now we know where the data begins so we should grab everything else
 	data = list(reader(open(file.name)))[i:]
-
+	# TODO: legacy inclusion, spend time to find whether this is needed anymore
 	offset150 = 10*np.log10((2*Zs)/Zo)
-
-
-	er2t = er2
-	er2n = er1/1.21 # this is an assumed 10% velocity difference for as150
-	normOffset = 20*np.log10(np.sqrt(2)*((np.abs(1-np.sqrt(er2n/er1)))/(np.abs(1-(er2t/er1)))))
-	# print("normOffset = " + str(normOffset))
-	# now we go through the rows and we know the first row (0) is the frequency, and based on experience
-	# and checking the files (THIS CAN BE A MISTAKE WHICH MUST BE CHANGED SOMETIMES), the 6th column (5)
-	# holds the 'normalized' as(150) Screening attentuation data
+	# fill the arrays with data from SA file
 	for d in data:
-		#s_measured = 20*np.log10(np.abs(np.float64(d[1]))) 
 		s_measured = np.float64(d[1])
-		# s_measured = float(d[5]) 
 		smeas.append(s_measured)
-		s150.append(s_measured-offset150)
-		sNorm.append(s_measured-offset150-normOffset)
+		s150.append(np.float64(d[2]))
+		sNorm.append(np.float64(d[3]))
 		freq.append(float(d[0]))
 
 	# return the data
@@ -192,7 +180,7 @@ def main():
 	SA_Plot = divider.append_axes("right", size=7, pad=0)
 
 	for i in range(len(TI_filenames)):
-		SA_Plot.plot(SA_Datum_Array[i][0],(SA_Datum_Array[i][1]),color=c[i],linewidth=5,linestyle=ls[i%len(ls)])
+		SA_Plot.plot(SA_Datum_Array[i][0],(SA_Datum_Array[i][3]),color=c[i],linewidth=5,linestyle=ls[i%len(ls)])
 		SA_Plot.plot([100,EnvelopesArray[i][0][0]],[EnvelopesArray[i][1][0],EnvelopesArray[i][1][0]],color='black',linewidth=2,linestyle=ls[i%len(ls)])
 		SA_Plot.plot(EnvelopesArray[i][0],(EnvelopesArray[i][1]),color='black',linewidth=5,linestyle=ls[i%len(ls)])
 
@@ -227,8 +215,6 @@ def main():
 	SA_Plot.yaxis.set_major_locator(MultipleLocator(20))
 	SA_Plot.yaxis.set_major_locator(MultipleLocator(10))
 	newax = TC_Plot_Fig.add_axes([0.82, (0.0 *(np.ceil(len(TI_filenames)/2)-1)), 0.1, 0.1], anchor='NE', zorder=-1)
-	#im.thumbnail((1000,1000), )
-	#newax.imshow(im)
 	newax.axis('off')
 	pt.subplots_adjust(top=0.96,bottom=0.14 + (0.01 *(np.ceil(len(TI_filenames)/2)-1)), right=0.92, left=0.11)
 	pt.show()
