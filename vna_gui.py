@@ -43,29 +43,24 @@ def pullData():
     # pulls the trace data directly from active trace
     data_raw = vna.query('CALC:DATA? FDAT')
     data = np.round(np.array([float(i) for i in data_raw.split(',')]), 2)
-
-    # TODO: pulls uncalibrated trace data - UCD flag doesn' twork
-    # data_uncal = vna.query('CALC:DATA? UCD')
-    # data_u = np.round(np.array([float(i) for i in data_uncal.split(',')]), 2)
     
     # pulls the frequency data and converts to MHz
     freq_raw = vna.query('CALC:DATA:STIM?')
     freq = np.round(np.array([float(i) for i in freq_raw.split(',')])/1E6, 6)
-    
-    # now plot data in a new window
+
+    # now plot data in a new window add block=False to plt.show()!
     plt.plot(freq,data)
     plt.ylim([-140,0])
     plt.semilogx()
     plt.xlabel('Frequency (MHz)')
     plt.ylabel('Magnitude (dB)')
     plt.title('Data from vna at ' + dt.datetime.now().strftime('%H:%M:%S'))
-    plt.show()
+    plt.show(block=False)
 
     global df
     # create a dataframe so we can easily save it later and transfer it between functions
     df = pd.DataFrame(np.transpose(data), index=np.transpose(freq), columns=['Magnitude (dB)'])
     df.index.name = 'Frequency (MHz)'
-    # TODO: df['Uncal'] = np.transpose(data_u)
 
     return df
 
