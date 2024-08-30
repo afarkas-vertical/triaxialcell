@@ -18,7 +18,12 @@ def saveButton():
     elif e2.index("end") == 0:
         print("Please add file name!")
     else:
-        df.to_csv(defaultName + '/' + e2.get() + '.csv')
+        try:
+            df.to_csv(defaultName + '/' + e2.get() + '.csv')
+            print(defaultName + '/' + e2.get() + '.csv' + ' saved')
+        except:
+            print('issue saving CSV file')
+    return
        
 def openDialog():
     global defaultName
